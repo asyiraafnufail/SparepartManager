@@ -1,7 +1,7 @@
 package com.asyiraaf.sparepartmanager.ui.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
@@ -18,8 +18,6 @@ import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.asyiraaf.sparepartmanager.ui.screens.*
 import com.asyiraaf.sparepartmanager.viewmodel.SparepartViewModel
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.fadeIn
 
 @Composable
 fun AppNavigation(viewModel: SparepartViewModel) {
@@ -103,16 +101,10 @@ fun AppNavigation(viewModel: SparepartViewModel) {
 
             composable("history") { HistoryScreen(navController, viewModel) }
 
-            // 1. HALAMAN ADD (Geser dari Kanan)
-            composable(
-                "add",
-                enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(400)) },
-                exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(400)) },
-                popEnterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(400)) },
-                popExitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(400)) }
-            ) { AddScreen(navController, viewModel) }
+            // 1. HALAMAN ADD
+            composable("add") { AddScreen(navController, viewModel) }
 
-            // 2. HALAMAN EDIT (Geser dari Kanan)
+            // 2. HALAMAN EDIT
             composable(
                 "edit/{id}/{kode}/{nama}/{harga}/{stok}",
                 arguments = listOf(
@@ -121,11 +113,7 @@ fun AppNavigation(viewModel: SparepartViewModel) {
                     navArgument("nama") { type = NavType.StringType },
                     navArgument("harga") { type = NavType.LongType },
                     navArgument("stok") { type = NavType.IntType }
-                ),
-                enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(400)) },
-                exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(400)) },
-                popEnterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(400)) },
-                popExitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(400)) }
+                )
             ) { backStack ->
                 val id = backStack.arguments?.getInt("id") ?: 0
                 val kode = backStack.arguments?.getString("kode") ?: ""
@@ -135,14 +123,10 @@ fun AppNavigation(viewModel: SparepartViewModel) {
                 EditScreen(navController, viewModel, id, kode, nama, harga, stok)
             }
 
-            // 3. HALAMAN TRANSAKSI MASUK/KELUAR (Geser dari Kanan)
+            // 3. HALAMAN TRANSAKSI MASUK/KELUAR
             composable(
                 "transaction/{type}",
-                arguments = listOf(navArgument("type") { type = NavType.StringType }),
-                enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(400)) },
-                exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(400)) },
-                popEnterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(400)) },
-                popExitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(400)) }
+                arguments = listOf(navArgument("type") { type = NavType.StringType })
             ) { backStack ->
                 val tipe = backStack.arguments?.getString("type") ?: "masuk"
                 TransactionScreen(navController, viewModel, tipe)
