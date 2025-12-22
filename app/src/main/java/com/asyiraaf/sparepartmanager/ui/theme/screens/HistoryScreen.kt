@@ -33,17 +33,18 @@ fun HistoryScreen(navController: NavController, viewModel: SparepartViewModel) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Riwayat Transaksi") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Kembali")
-                    }
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "Riwayat Transaksi",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 20.sp,
+                        color = Color.Black
+                    )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF673AB7), // Warna Ungu
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.White,
+                    titleContentColor = Color.Black
                 )
             )
         }
@@ -59,7 +60,6 @@ fun HistoryScreen(navController: NavController, viewModel: SparepartViewModel) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // --- PERBAIKAN SORTING DI SINI ---
                 // Mengurutkan berdasarkan Tanggal (Descending = Terbesar/Terbaru ke Terkecil/Terlama)
                 val sortedList = listRiwayat.sortedByDescending { it.tanggal }
 
@@ -76,11 +76,9 @@ fun HistoryScreen(navController: NavController, viewModel: SparepartViewModel) {
     }
 }
 
-// --- KOMPONEN KARTU HISTORY ---
 @Composable
 fun HistoryItem(namaBarang: String, jenis: String, jumlah: Int, tanggalMillis: Long) {
-    // Cek jenis transaksi untuk menentukan warna & icon
-    // Kita anggap "Masuk" dan "Stok Awal" & "Koreksi Masuk" sebagai warna HIJAU
+    // "Masuk" dan "Stok Awal" & "Koreksi Masuk" sebagai warna HIJAU
     val isMasuk = jenis.contains("Masuk", ignoreCase = true) || jenis.contains("Awal", ignoreCase = true)
 
     val warna = if (isMasuk) Color(0xFF4CAF50) else Color(0xFFF44336)

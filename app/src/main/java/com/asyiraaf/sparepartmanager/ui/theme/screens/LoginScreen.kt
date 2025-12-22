@@ -89,7 +89,7 @@ fun LoginScreen(navController: NavController) {
             text = if (isCreatingNew) "BUAT PIN BARU" else "MASUKKAN PIN",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFFFF4081)
+            color = Color(0xFF000000)
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
@@ -108,8 +108,8 @@ fun LoginScreen(navController: NavController) {
                     modifier = Modifier
                         .size(24.dp)
                         .clip(CircleShape)
-                        .background(if (isFilled) Color(0xFFFF4081) else Color.Transparent)
-                        .border(2.dp, Color(0xFFFF4081), CircleShape)
+                        .background(if (isFilled) Color(0xFF000000) else Color.Transparent)
+                        .border(2.dp, Color(0xFF000000), CircleShape)
                 )
             }
         }
@@ -216,15 +216,13 @@ fun LoginScreen(navController: NavController) {
                             Toast.makeText(context, "Kode Salah!", Toast.LENGTH_SHORT).show()
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4081))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF000000))
                 ) { Text("Reset") }
             },
             dismissButton = { TextButton(onClick = { showForgotDialog = false }) { Text("Batal") } }
         )
     }
 }
-
-// --- FUNGSI BANTUAN (HELPER) DI BAWAH SINI ---
 
 fun goToHome(navController: NavController) {
     navController.navigate("home") {

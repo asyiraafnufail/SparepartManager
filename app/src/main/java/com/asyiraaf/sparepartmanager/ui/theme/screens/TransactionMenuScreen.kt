@@ -28,14 +28,16 @@ import com.asyiraaf.sparepartmanager.viewmodel.SparepartViewModel
 fun TransactionMenuScreen(navController: NavController, viewModel: SparepartViewModel) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Menu Transaksi") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Kembali")
-                    }
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "Menu Transaksi",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 20.sp,
+                        color = Color.Black
+                    )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.White,
                     titleContentColor = Color.Black
                 )
