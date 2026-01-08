@@ -58,7 +58,6 @@ fun TransactionMenuScreen(navController: NavController, viewModel: SparepartView
     ) { uri ->
         if (uri != null) {
             // Konfirmasi sebelum menimpa data
-            // (Untuk sederhananya kita langsung jalankan, tapi di real app sebaiknya ada Dialog Yes/No)
             scope.launch(Dispatchers.IO) {
                 launch(Dispatchers.Main) {
                     Toast.makeText(context, "Memproses data...", Toast.LENGTH_SHORT).show()

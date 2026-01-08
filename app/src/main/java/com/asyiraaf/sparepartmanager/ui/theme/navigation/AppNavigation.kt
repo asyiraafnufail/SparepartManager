@@ -85,8 +85,6 @@ fun AppNavigation(viewModel: SparepartViewModel) {
             startDestination = "home", // LANGSUNG KE HOME
             modifier = Modifier.padding(innerPadding)
         ) {
-            // Hapus rute "splash" dan "login" dari sini
-
             composable("home") { HomeScreen(navController, viewModel) }
 
             composable("transaksi_menu") { TransactionMenuScreen(navController, viewModel) }

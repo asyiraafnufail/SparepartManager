@@ -17,12 +17,11 @@ abstract class SparepartDatabase : RoomDatabase() {
     companion object {
         @Volatile private var INSTANCE: SparepartDatabase? = null
 
-        // Tetap pakai password agar data tidak hilang/error saat dibuka
         private val PASSPHRASE = "KunciRahasiaDapurSparepart2025!@#".toByteArray()
 
         fun getDatabase(context: Context): SparepartDatabase {
             return INSTANCE ?: synchronized(this) {
-                // Konfigurasi Standar SQLCipher
+                // Konfigurasi SQLCipher
                 val factory = SupportFactory(PASSPHRASE)
 
                 Room.databaseBuilder(context.applicationContext, SparepartDatabase::class.java, "sparepart_db")
