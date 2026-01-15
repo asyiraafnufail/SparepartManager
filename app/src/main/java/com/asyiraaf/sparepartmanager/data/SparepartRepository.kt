@@ -50,7 +50,4 @@ class SparepartRepository(private val dao: SparepartDao) {
     suspend fun checkDuplicateUpdate(id: Int, kode: String, nama: String): Int {
         return dao.checkDuplicateUpdate(id, kode, nama)
     }
-
-    // --- PASTIKAN TIDAK ADA FUNGSI CHECKPOINT DI SINI ---
-    // (Fungsi checkpoint sudah dihapus karena dipindah ke SparepartDatabase)
 }

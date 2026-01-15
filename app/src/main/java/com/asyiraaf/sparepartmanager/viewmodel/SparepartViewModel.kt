@@ -14,8 +14,6 @@ class SparepartViewModel(private val repo: SparepartRepository) : ViewModel() {
 
     // 1. LOGIKA SEARCH & LIST DATA
     private val _searchQuery = MutableStateFlow("")
-
-    // Perbaikan: Menggunakan 'repo.allSpareparts', bukan 'repo.allData'
     val listSparepart: LiveData<List<Sparepart>> = _searchQuery.flatMapLatest { query ->
         if (query.isEmpty()) {
             repo.allSpareparts
