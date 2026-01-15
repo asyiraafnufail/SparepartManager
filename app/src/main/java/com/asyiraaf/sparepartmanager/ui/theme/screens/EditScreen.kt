@@ -118,7 +118,7 @@ fun EditScreen(
                             } else {
                                 val stokBaru = stok.toInt()
 
-                                // 1. --- FITUR BARU: CEK SELISIH STOK UNTUK HISTORY ---
+                                // 1. CEK SELISIH STOK UNTUK HISTORY
                                 val selisih = stokBaru - stokLama
                                 if (selisih != 0) {
                                     // Jika selisih positif (Misal 10 jadi 12) = +2 (Koreksi Masuk)
@@ -134,7 +134,6 @@ fun EditScreen(
                                     )
                                     viewModel.insertRiwayat(riwayatKoreksi)
                                 }
-                                // -----------------------------------------------------
 
                                 // 2. Update Data Barang Utama
                                 val barangUpdate = Sparepart(

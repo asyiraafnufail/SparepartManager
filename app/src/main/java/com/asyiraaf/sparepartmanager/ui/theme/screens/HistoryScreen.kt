@@ -116,7 +116,6 @@ fun HistoryItem(namaBarang: String, jenis: String, jumlah: Int, tanggalMillis: L
 
             // Detail Teks
             Column(modifier = Modifier.weight(1f)) {
-                // Tampilkan Label Jenis (Kecil di atas)
                 Text(
                     text = jenis,
                     fontSize = 11.sp,

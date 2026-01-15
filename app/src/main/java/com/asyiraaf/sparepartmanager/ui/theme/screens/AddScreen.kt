@@ -111,18 +111,17 @@ fun AddScreen(navController: NavController, viewModel: SparepartViewModel) {
                                 )
                                 viewModel.insert(barangBaru)
 
-                                // 2. --- FITUR BARU: CATAT KE HISTORY (STOK AWAL) ---
+                                // 2. CATAT KE HISTORY (STOK AWAL)
                                 if (stokInt > 0) {
                                     val riwayatAwal = Riwayat(
                                         id = 0,
                                         namaBarang = nama,
-                                        jenis = "Stok Awal", // Penanda barang baru
+                                        jenis = "Stok Awal",
                                         jumlah = stokInt,
                                         tanggal = System.currentTimeMillis()
                                     )
                                     viewModel.insertRiwayat(riwayatAwal)
                                 }
-                                // ---------------------------------------------------
 
                                 Toast.makeText(context, "Berhasil disimpan!", Toast.LENGTH_SHORT).show()
                                 navController.popBackStack()

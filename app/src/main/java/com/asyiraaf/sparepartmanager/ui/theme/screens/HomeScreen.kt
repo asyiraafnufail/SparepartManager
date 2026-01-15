@@ -10,7 +10,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,8 +23,8 @@ import java.util.Locale
 fun HomeScreen(navController: NavController, viewModel: SparepartViewModel) {
     val listSparepart by viewModel.listSparepart.observeAsState(emptyList())
 
-    // 1. FIX BUG: Reset pencarian otomatis saat halaman ini dibuka kembali
-    // Ini memastikan saat tombol 'Back' ditekan, list kembali penuh (reset).
+    // Reset pencarian otomatis saat halaman ini dibuka kembali
+    // Saat tombol 'Back' ditekan, list kembali penuh (reset).
     LaunchedEffect(Unit) {
         viewModel.setPencarian("")
     }
@@ -34,7 +33,6 @@ fun HomeScreen(navController: NavController, viewModel: SparepartViewModel) {
     var searchQuery by remember { mutableStateOf("") }
 
     Scaffold(
-        // 2. UI FIX: Menggunakan CenterAlignedTopAppBar agar Judul di TENGAH
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -58,7 +56,6 @@ fun HomeScreen(navController: NavController, viewModel: SparepartViewModel) {
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            // 3. UI FIX: Mengurangi jarak atas (top padding) agar tidak terlalu jauh dari header
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = {
@@ -68,7 +65,7 @@ fun HomeScreen(navController: NavController, viewModel: SparepartViewModel) {
                 label = { Text("Cari Barang...") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 4.dp, bottom = 16.dp), // Jarak atas diperkecil
+                    .padding(top = 4.dp, bottom = 16.dp),
                 shape = MaterialTheme.shapes.medium,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Black,
@@ -83,7 +80,6 @@ fun HomeScreen(navController: NavController, viewModel: SparepartViewModel) {
 
             if (listSparepart.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    // Pesan berbeda jika sedang mencari atau memang database kosong
                     if (searchQuery.isNotEmpty()) {
                         Text("Barang tidak ditemukan", color = Color.Gray)
                     } else {
