@@ -1,6 +1,7 @@
 package com.asyiraaf.sparepartmanager.ui.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -8,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -25,14 +27,28 @@ import com.asyiraaf.sparepartmanager.viewmodel.SparepartViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionScreen(navController: NavController, viewModel: SparepartViewModel, tipeTransaksi: String) {
-    // tipeTransaksi: "masuk" atau "keluar"
-
-    // Ambil semua data barang (untuk pengecekan validasi di balik layar)
+    // 1. DATA
     val listBarang by viewModel.listSparepart.observeAsState(emptyList())
 
-    // State Input Manual
+    // 2. STATE INPUT
     var kodeInput by remember { mutableStateOf("") }
     var jumlahInput by remember { mutableStateOf("") }
+    var isRekomendasiAktif by remember { mutableStateOf(false) } // Kontrol manual tampil/sembunyi list
+
+    // 3. LOGIKA FILTER (REKOMENDASI)
+    val filteredOptions = remember(kodeInput, listBarang) {
+        if (kodeInput.isEmpty()) {
+            emptyList()
+        } else {
+            listBarang.filter {
+                it.kode.contains(kodeInput, ignoreCase = true) ||
+                        it.nama.contains(kodeInput, ignoreCase = true)
+            }
+        }
+    }
+
+    // Cari barang yang cocok persis (Untuk validasi)
+    val barangDitemukan = listBarang.find { it.kode.equals(kodeInput, ignoreCase = true) }
 
     val context = LocalContext.current
     val isMasuk = tipeTransaksi == "masuk"
@@ -60,33 +76,86 @@ fun TransactionScreen(navController: NavController, viewModel: SparepartViewMode
             modifier = Modifier
                 .padding(padding)
                 .padding(16.dp)
+                .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
 
-            // --- INPUT KODE BARANG (MANUAL) ---
             Text("Data Transaksi", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Spacer(modifier = Modifier.height(16.dp))
 
+            // --- INPUT KODE BARANG (AUTO-COMPLETE LIST) ---
             OutlinedTextField(
                 value = kodeInput,
-                onValueChange = { kodeInput = it },
-                label = { Text("Ketik Kode Barang") },
-                placeholder = { Text("Contoh: OLI001") },
+                onValueChange = {
+                    kodeInput = it
+                    isRekomendasiAktif = true // Tampilkan rekomendasi saat mengetik
+                },
+                label = { Text("Cari Kode / Nama Barang") },
+                placeholder = { Text("Ketik 'OLI' atau 'K001'...") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = warnaTema,
+                    focusedLabelColor = warnaTema
+                )
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Info kecil (Validasi Realtime)
-            val barangDitemukan = listBarang.find { it.kode.equals(kodeInput, ignoreCase = true) }
-            if (kodeInput.isNotEmpty()) {
-                if (barangDitemukan != null) {
-                    Text("✓ Barang Ditemukan: ${barangDitemukan.nama}", color = Color(0xFF4CAF50), fontSize = 12.sp)
-                    Text("   Sisa Stok: ${barangDitemukan.stok}", color = Color.Gray, fontSize = 12.sp)
-                } else {
-                    Text("✗ Barang tidak ditemukan", color = Color.Red, fontSize = 12.sp)
+            // --- LIST REKOMENDASI (Muncul di bawah input) ---
+            // Kita pakai Column biasa agar tidak crash (LazyColumn di dalam ScrollScreen = Crash)
+            if (isRekomendasiAktif && filteredOptions.isNotEmpty()) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
+                    Column {
+                        // Tampilkan maksimal 5 rekomendasi agar tidak terlalu panjang
+                        filteredOptions.take(5).forEach { item ->
+                            ListItem(
+                                headlineContent = {
+                                    Text("${item.kode} - ${item.nama}", fontWeight = FontWeight.Bold)
+                                },
+                                supportingContent = {
+                                    Text("Sisa Stok: ${item.stok}", fontSize = 12.sp)
+                                },
+                                modifier = Modifier
+                                    .clickable {
+                                        kodeInput = item.kode // Isi otomatis
+                                        isRekomendasiAktif = false // Sembunyikan list
+                                    },
+                                colors = ListItemDefaults.colors(containerColor = Color.White)
+                            )
+                            Divider(thickness = 0.5.dp, color = Color.LightGray)
+                        }
+                    }
                 }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // --- INFO BARANG (Jika cocok) ---
+            if (barangDitemukan != null) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text("✓ Barang Terpilih:", color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text(barangDitemukan.nama, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text("Sisa Stok: ${barangDitemukan.stok}", fontSize = 14.sp, color = Color.Gray)
+
+                        // Validasi stok untuk Transaksi Keluar
+                        if (!isMasuk && barangDitemukan.stok <= 0) {
+                            Text("⚠ Stok Habis!", color = Color.Red, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
+                        }
+                    }
+                }
+            } else if (kodeInput.isNotEmpty() && !isRekomendasiAktif) {
+                // Info merah hanya muncul jika user selesai memilih/mengetik tapi tidak ketemu
+                Text("✗ Kode tidak ditemukan", color = Color.Red, fontSize = 12.sp)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -97,42 +166,41 @@ fun TransactionScreen(navController: NavController, viewModel: SparepartViewMode
                 onValueChange = { if (it.all { char -> char.isDigit() }) jumlahInput = it },
                 label = { Text("Jumlah") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = warnaTema,
+                    focusedLabelColor = warnaTema
+                )
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // --- TOMBOL SIMPAN DENGAN VALIDASI (FITUR KEDUA) ---
+            // --- TOMBOL SIMPAN ---
             Button(
                 onClick = {
                     val jumlah = jumlahInput.toIntOrNull() ?: 0
 
-                    // 1. VALIDASI: Apakah kode barang ada?
                     if (barangDitemukan == null) {
-                        Toast.makeText(context, "Kode Barang SALAH / Tidak Ditemukan!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Pilih barang yang valid dulu!", Toast.LENGTH_SHORT).show()
                         return@Button
                     }
-
-                    // 2. VALIDASI: Apakah jumlah diisi?
                     if (jumlah <= 0) {
-                        Toast.makeText(context, "Jumlah harus lebih dari 0!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Jumlah minimal 1!", Toast.LENGTH_SHORT).show()
                         return@Button
                     }
-
-                    // 3. VALIDASI KHUSUS KELUAR: Cek stok cukup gak?
                     if (!isMasuk && barangDitemukan.stok < jumlah) {
                         Toast.makeText(context, "Stok tidak cukup! Sisa: ${barangDitemukan.stok}", Toast.LENGTH_LONG).show()
                         return@Button
                     }
 
-                    // --- JIKA LOLOS SEMUA VALIDASI -> PROSES ---
+                    // PROSES
                     if (isMasuk) {
                         viewModel.stokMasuk(barangDitemukan.id, jumlah)
                     } else {
                         viewModel.stokKeluar(barangDitemukan.id, jumlah)
                     }
 
-                    // Simpan ke Riwayat
+                    // RIWAYAT
                     val riwayatBaru = Riwayat(
                         id = 0,
                         namaBarang = barangDitemukan.nama,
